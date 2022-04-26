@@ -36,7 +36,7 @@ class Trade {
 
     this.ws.on("message", (data) => {
       const reqData = JSON.parse(data.toString());
-      //   console.log(reqData);
+        // console.log(reqData);
       if (typeof reqData !== undefined && reqData.data) {
         const timeStamp = new Date(reqData?.data?.[0]?.timestamp);
 
@@ -69,7 +69,7 @@ class Trade {
             this.oneMinRecord.closeTime = oneMinCloseTime;
           });
         } else {
-          this.oneMinRecord.key = "ONEMIN";
+          this.oneMinRecord.key = "1min";
           this.pushToDB(this.oneMinRecord);
           oneMinOpenTime = oneMinCloseTime;
           const newCloseTime = timeStamp.getTime();
@@ -101,7 +101,7 @@ class Trade {
             this.fiveMinRecord.closeTime = fiveMinCloseTime;
           });
         } else {
-          this.fiveMinRecord.key = "FIVEMIN";
+          this.fiveMinRecord.key = "5min";
           this.pushToDB(this.fiveMinRecord);
           fiveMinOpenTime = fiveMinCloseTime;
           const newCloseTime = timeStamp.getTime();
@@ -133,11 +133,11 @@ class Trade {
             this.fifteenMinRecord.closeTime = fifteenMinCloseTime;
           });
         } else {
-          this.fifteenMinRecord.key = "FIFTEENMIN";
+          this.fifteenMinRecord.key = "15min";
           this.pushToDB(this.fifteenMinRecord);
           fifteenMinOpenTime = fifteenMinCloseTime;
           const newCloseTime = timeStamp.getTime();
-          fifteenMinCloseTime = getCloseTime(newCloseTime, 5);
+          fifteenMinCloseTime = getCloseTime(newCloseTime, 15);
           this.fifteenMinRecord = getDefaultData();
         }
 
@@ -165,11 +165,11 @@ class Trade {
             this.oneHourRecord.closeTime = oneHourCloseTime;
           });
         } else {
-          this.oneHourRecord.key = "ONEHOUR";
+          this.oneHourRecord.key = "1h";
           this.pushToDB(this.oneHourRecord);
           oneHourOpenTime = oneHourCloseTime;
           const newCloseTime = timeStamp.getTime();
-          oneHourCloseTime = getCloseTime(newCloseTime, 5);
+          oneHourCloseTime = getCloseTime(newCloseTime, 60);
           this.oneHourRecord = getDefaultData();
         }
 
@@ -197,11 +197,11 @@ class Trade {
             this.fourHourRecord.closeTime = fourHourCloseTime;
           });
         } else {
-          this.fourHourRecord.key = "FOURHOUR";
+          this.fourHourRecord.key = "4h";
           this.pushToDB(this.fourHourRecord);
           fourHourOpenTime = fourHourCloseTime;
           const newCloseTime = timeStamp.getTime();
-          fourHourCloseTime = getCloseTime(newCloseTime, 5);
+          fourHourCloseTime = getCloseTime(newCloseTime, 4 * 60);
           this.fourHourRecord = getDefaultData();
         }
 
@@ -229,11 +229,11 @@ class Trade {
             this.oneDayRecord.closeTime = oneDayCloseTime;
           });
         } else {
-          this.oneDayRecord.key = "ONEDAY";
+          this.oneDayRecord.key = "1d";
           this.pushToDB(this.oneDayRecord);
           oneDayOpenTime = oneDayCloseTime;
           const newCloseTime = timeStamp.getTime();
-          oneDayCloseTime = getCloseTime(newCloseTime, 5);
+          oneDayCloseTime = getCloseTime(newCloseTime, 24 * 60);
           this.oneDayRecord = getDefaultData();
         }
       }

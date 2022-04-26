@@ -48,18 +48,18 @@ const run = async () => {
     eachMessage: async ({ topic, partition, message }) => {
       const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
 
-      // console.log(
-      //   "======================================================================="
-      // );
+      console.log(
+        "======================================================================="
+      );
 
-      // console.log(
-      //   `- ${prefix} ${message.key}# `,
-      //   JSON.parse(message.value.toString())
-      // );
+      console.log(
+        `- ${prefix} ${message.key}# `,
+        JSON.parse(message.value.toString())
+      );
 
-      // console.log(
-      //   "======================================================================="
-      // );
+      console.log(
+        "======================================================================="
+      );
 
       wss.clients.forEach(function each(client) {
         let type = JSON.parse(message.value.toString()).type;
@@ -86,4 +86,3 @@ wss.on("close", (req) =>
 server.listen(PORT, () => {
   console.log(`Server is up and running on port ${PORT}`);
 });
-

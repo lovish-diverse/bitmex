@@ -5,6 +5,7 @@ const getOpenTime = (time, interval) => {
     Math.floor(time / (interval * msIn1min)) * (interval * msIn1min)
   );
 };
+
 const getCloseTime = (time, interval) => {
   return new Date(
     Math.ceil(time / (interval * msIn1min)) * (interval * msIn1min)

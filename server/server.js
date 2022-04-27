@@ -6,10 +6,12 @@ import {
   getTFfromResolution,
   getTimeFromSeconds,
 } from "./utils/utils.js";
-import encryptor from "simple-encryptor";
+import createEncryptor from "simple-encryptor";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const SECRET = process.env.SECRET || "HiIamASecretKeyThatYouCanNotGuess";
+const encryptor = createEncryptor(SECRET);
 
 app.get("/ping", (req, res) => {
   res.send("Server is live!! Pong!!!");
@@ -40,8 +42,8 @@ app.get("/api/trade", async (req, res) => {
               $match: {
                 $expr: {
                   $or: [
-                    { $gt: ["$openTime", fromTime] },
-                    { $lt: ["$closeTime", toTime] },
+                    { $gte: ["$openTime", fromTime] },
+                    { $lte: ["$closeTime", toTime] },
                   ],
                 },
               },
@@ -52,11 +54,13 @@ app.get("/api/trade", async (req, res) => {
         res.status(200).json({
           success: true,
           message: "Success",
-          data: formatOHLCData(
-            records,
-            req.query.to,
-            req.query.from,
-            req.query.resolution
+          data: encryptor.encrypt(
+            formatOHLCData(
+              records,
+              req.query.to,
+              req.query.from,
+              req.query.resolution
+            )
           ),
         });
 

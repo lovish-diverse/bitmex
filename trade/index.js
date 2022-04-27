@@ -34,9 +34,9 @@ class Trade {
     let oneDayOpenTime = getOpenTime(d, 24 * 60);
     let oneDayCloseTime = getCloseTime(d, 24 * 60);
 
-    this.ws.on("message", (data) => {
+    this.ws.on("message", async (data) => {
       const reqData = JSON.parse(data.toString());
-        // console.log(reqData);
+      // console.log(reqData);
       if (typeof reqData !== undefined && reqData.data) {
         const timeStamp = new Date(reqData?.data?.[0]?.timestamp);
 
@@ -48,193 +48,133 @@ class Trade {
         if (timeStamp <= oneMinCloseTime) {
           console.log("UNDER 1 MIN");
           const recordArrInSameTime = reqData?.data;
-          recordArrInSameTime.forEach((elem) => {
-            if (!this.oneMinRecord.open) {
-              this.oneMinRecord = {
-                open: elem.price,
-                close: elem.price,
-                high: elem.price,
-                low: elem.price,
-                type: this.coin,
-              };
-            }
-            if (this.oneMinRecord.high < elem.price) {
-              this.oneMinRecord["high"] = elem.price;
-            }
-            if (this.oneMinRecord.low > elem.price) {
-              this.oneMinRecord["low"] = elem.price;
-            }
-            this.oneMinRecord["close"] = elem.price;
-            this.oneMinRecord.openTime = oneMinOpenTime;
-            this.oneMinRecord.closeTime = oneMinCloseTime;
-          });
+          this.oneMinRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.oneMinRecord
+          );
         } else {
+          this.oneMinRecord.openTime = oneMinOpenTime;
+          this.oneMinRecord.closeTime = oneMinCloseTime;
           this.oneMinRecord.key = "1min";
-          this.pushToDB(this.oneMinRecord);
+          await this.pushToDB(this.oneMinRecord);
+          this.oneMinRecord.open = "";
           oneMinOpenTime = oneMinCloseTime;
-          const newCloseTime = timeStamp.getTime();
-          oneMinCloseTime = getCloseTime(newCloseTime, 1);
-          this.oneMinRecord = getDefaultData();
+          oneMinCloseTime = getCloseTime(timeStamp.getTime(), 1);
+          const recordArrInSameTime = reqData?.data;
+          this.oneMinRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.oneMinRecord
+          );
         }
 
         if (timeStamp <= fiveMinCloseTime) {
           console.log("UNDER 5 MIN");
           const recordArrInSameTime = reqData?.data;
-          recordArrInSameTime.forEach((elem) => {
-            if (!this.fiveMinRecord.open) {
-              this.fiveMinRecord = {
-                open: elem.price,
-                close: elem.price,
-                high: elem.price,
-                low: elem.price,
-                type: this.coin,
-              };
-            }
-            if (this.fiveMinRecord.high < elem.price) {
-              this.fiveMinRecord["high"] = elem.price;
-            }
-            if (this.fiveMinRecord.low > elem.price) {
-              this.fiveMinRecord["low"] = elem.price;
-            }
-            this.fiveMinRecord["close"] = elem.price;
-            this.fiveMinRecord.openTime = fiveMinOpenTime;
-            this.fiveMinRecord.closeTime = fiveMinCloseTime;
-          });
+          this.fiveMinRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.fiveMinRecord
+          );
         } else {
+          this.fiveMinRecord.openTime = fiveMinOpenTime;
+          this.fiveMinRecord.closeTime = fiveMinCloseTime;
           this.fiveMinRecord.key = "5min";
-          this.pushToDB(this.fiveMinRecord);
+          await this.pushToDB(this.fiveMinRecord);
+          this.fiveMinRecord.open = "";
           fiveMinOpenTime = fiveMinCloseTime;
-          const newCloseTime = timeStamp.getTime();
-          fiveMinCloseTime = getCloseTime(newCloseTime, 5);
-          this.fiveMinRecord = getDefaultData();
+          fiveMinCloseTime = getCloseTime(timeStamp.getTime(), 5);
+          const recordArrInSameTime = reqData?.data;
+          this.fiveMinRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.fiveMinRecord
+          );
         }
 
         if (timeStamp <= fifteenMinCloseTime) {
           console.log("UNDER 15 MIN");
           const recordArrInSameTime = reqData?.data;
-          recordArrInSameTime.forEach((elem) => {
-            if (!this.fifteenMinRecord.open) {
-              this.fifteenMinRecord = {
-                open: elem.price,
-                close: elem.price,
-                high: elem.price,
-                low: elem.price,
-                type: this.coin,
-              };
-            }
-            if (this.fifteenMinRecord.high < elem.price) {
-              this.fifteenMinRecord["high"] = elem.price;
-            }
-            if (this.fifteenMinRecord.low > elem.price) {
-              this.fifteenMinRecord["low"] = elem.price;
-            }
-            this.fifteenMinRecord["close"] = elem.price;
-            this.fifteenMinRecord.openTime = fifteenMinOpenTime;
-            this.fifteenMinRecord.closeTime = fifteenMinCloseTime;
-          });
+          this.fifteenMinRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.fifteenMinRecord
+          );
         } else {
+          this.fifteenMinRecord.openTime = fifteenMinOpenTime;
+          this.fifteenMinRecord.closeTime = fifteenMinCloseTime;
           this.fifteenMinRecord.key = "15min";
-          this.pushToDB(this.fifteenMinRecord);
+          await this.pushToDB(this.fifteenMinRecord);
+          this.fifteenMinRecord.open = "";
           fifteenMinOpenTime = fifteenMinCloseTime;
-          const newCloseTime = timeStamp.getTime();
-          fifteenMinCloseTime = getCloseTime(newCloseTime, 15);
-          this.fifteenMinRecord = getDefaultData();
+          fifteenMinCloseTime = getCloseTime(timeStamp.getTime(), 15);
+          const recordArrInSameTime = reqData?.data;
+          this.fifteenMinRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.fifteenMinRecord
+          );
         }
 
         if (timeStamp <= oneHourCloseTime) {
           console.log("UNDER 1 HOUR");
           const recordArrInSameTime = reqData?.data;
-          recordArrInSameTime.forEach((elem) => {
-            if (!this.oneHourRecord.open) {
-              this.oneHourRecord = {
-                open: elem.price,
-                close: elem.price,
-                high: elem.price,
-                low: elem.price,
-                type: this.coin,
-              };
-            }
-            if (this.oneHourRecord.high < elem.price) {
-              this.oneHourRecord["high"] = elem.price;
-            }
-            if (this.oneHourRecord.low > elem.price) {
-              this.oneHourRecord["low"] = elem.price;
-            }
-            this.oneHourRecord["close"] = elem.price;
-            this.oneHourRecord.openTime = oneHourOpenTime;
-            this.oneHourRecord.closeTime = oneHourCloseTime;
-          });
+          this.oneHourRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.oneHourRecord
+          );
         } else {
+          this.oneHourRecord.openTime = oneHourOpenTime;
+          this.oneHourRecord.closeTime = oneHourCloseTime;
           this.oneHourRecord.key = "1h";
-          this.pushToDB(this.oneHourRecord);
+          await this.pushToDB(this.oneHourRecord);
+          this.oneHourRecord.open = "";
           oneHourOpenTime = oneHourCloseTime;
-          const newCloseTime = timeStamp.getTime();
-          oneHourCloseTime = getCloseTime(newCloseTime, 60);
-          this.oneHourRecord = getDefaultData();
+          oneHourCloseTime = getCloseTime(timeStamp.getTime(), 60);
+          const recordArrInSameTime = reqData?.data;
+          this.oneHourRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.oneHourRecord
+          );
         }
 
         if (timeStamp <= fourHourCloseTime) {
           console.log("UNDER  4 HOUR");
           const recordArrInSameTime = reqData?.data;
-          recordArrInSameTime.forEach((elem) => {
-            if (!this.fourHourRecord.open) {
-              this.fourHourRecord = {
-                open: elem.price,
-                close: elem.price,
-                high: elem.price,
-                low: elem.price,
-                type: this.coin,
-              };
-            }
-            if (this.fourHourRecord.high < elem.price) {
-              this.fourHourRecord["high"] = elem.price;
-            }
-            if (this.fourHourRecord.low > elem.price) {
-              this.fourHourRecord["low"] = elem.price;
-            }
-            this.fourHourRecord["close"] = elem.price;
-            this.fourHourRecord.openTime = fourHourOpenTime;
-            this.fourHourRecord.closeTime = fourHourCloseTime;
-          });
+          this.fourHourRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.fourHourRecord
+          );
         } else {
+          this.fourHourRecord.openTime = fourHourOpenTime;
+          this.fourHourRecord.closeTime = fourHourCloseTime;
           this.fourHourRecord.key = "4h";
-          this.pushToDB(this.fourHourRecord);
+          await this.pushToDB(this.fourHourRecord);
+          this.fourHourRecord.open = "";
           fourHourOpenTime = fourHourCloseTime;
-          const newCloseTime = timeStamp.getTime();
-          fourHourCloseTime = getCloseTime(newCloseTime, 4 * 60);
-          this.fourHourRecord = getDefaultData();
+          fourHourCloseTime = getCloseTime(timeStamp.getTime(), 4 * 60);
+          const recordArrInSameTime = reqData?.data;
+          this.fourHourRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.fourHourRecord
+          );
         }
 
         if (timeStamp <= oneDayCloseTime) {
           console.log("UNDER 1 DAY");
           const recordArrInSameTime = reqData?.data;
-          recordArrInSameTime.forEach((elem) => {
-            if (!this.oneDayRecord.open) {
-              this.oneDayRecord = {
-                open: elem.price,
-                close: elem.price,
-                high: elem.price,
-                low: elem.price,
-                type: this.coin,
-              };
-            }
-            if (this.oneDayRecord.high < elem.price) {
-              this.oneDayRecord["high"] = elem.price;
-            }
-            if (this.oneDayRecord.low > elem.price) {
-              this.oneDayRecord["low"] = elem.price;
-            }
-            this.oneDayRecord["close"] = elem.price;
-            this.oneDayRecord.openTime = oneDayOpenTime;
-            this.oneDayRecord.closeTime = oneDayCloseTime;
-          });
+          this.oneDayRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.oneDayRecord
+          );
         } else {
+          this.oneDayRecord.openTime = oneDayOpenTime;
+          this.oneDayRecord.closeTime = oneDayCloseTime;
           this.oneDayRecord.key = "1d";
-          this.pushToDB(this.oneDayRecord);
+          await this.pushToDB(this.oneDayRecord);
+          this.oneDayRecord.open = "";
           oneDayOpenTime = oneDayCloseTime;
-          const newCloseTime = timeStamp.getTime();
-          oneDayCloseTime = getCloseTime(newCloseTime, 24 * 60);
-          this.oneDayRecord = getDefaultData();
+          oneDayCloseTime = getCloseTime(timeStamp.getTime(), 24 * 60);
+          const recordArrInSameTime = reqData?.data;
+          this.oneDayRecord = this.updateOHCLValues(
+            recordArrInSameTime,
+            this.oneDayRecord
+          );
         }
       }
     });
@@ -246,7 +186,10 @@ class Trade {
         .collection(`${this.coin}-Trade-${data.key}`)
         .insertOne({ ...data, createdAt: new Date() });
       if (doc) {
-        console.log("Document added successfully", doc);
+        console.log(
+          `Document added successfully for ${data.type} ${data.key}`,
+          doc
+        );
       }
     } catch (error) {
       console.error(error);
@@ -276,6 +219,29 @@ class Trade {
         ],
       });
     }, 1000);
+  }
+
+  updateOHCLValues(dataArr, initialValues) {
+    // console.log({ initialValues });
+    dataArr.forEach((elem) => {
+      if (!initialValues.open) {
+        initialValues = {
+          open: elem.price,
+          close: elem.price,
+          high: elem.price,
+          low: elem.price,
+          type: this.coin,
+        };
+      }
+      if (initialValues.high < elem.price) {
+        initialValues["high"] = elem.price;
+      }
+      if (initialValues.low > elem.price) {
+        initialValues["low"] = elem.price;
+      }
+      initialValues["close"] = elem.price;
+    });
+    return initialValues;
   }
 }
 

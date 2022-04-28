@@ -3,8 +3,8 @@ import kafka from "./kafka.js";
 import dbConnect from "./utils/db.js";
 import crypto from "crypto";
 
-import { getOpenTime, getCloseTime, getDefaultData } from "./utils/utils.js";
 
+import { getOpenTime, getCloseTime, getDefaultData } from "./utils/utils.js";
 class Trade {
   constructor(coin) {
     this.coin = coin;

@@ -3,10 +3,12 @@ import { client, dbConnect } from "./db/db.js";
 import {
   coins,
   formatOHLCData,
+  generateRedisKey,
   getTFfromResolution,
   getTimeFromSeconds,
 } from "./utils/utils.js";
 import createEncryptor from "simple-encryptor";
+import { cacheMiddleware, redisClient } from "./redis.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,7 +19,7 @@ app.get("/ping", (req, res) => {
   res.send("Server is live!! Pong!!!");
 });
 
-app.get("/api/trade", async (req, res) => {
+app.get("/api/trade", cacheMiddleware, async (req, res) => {
   const timeFrame = getTFfromResolution(req.query.resolution);
   const coin = `${req.query.symbol}USD`;
   const toTime = getTimeFromSeconds(req.query.to);
@@ -51,6 +53,19 @@ app.get("/api/trade", async (req, res) => {
           ])
           .toArray();
 
+        await redisClient.set(
+          generateRedisKey({ ...req.query }),
+          encryptor.encrypt(
+            formatOHLCData(
+              records,
+              req.query.to,
+              req.query.from,
+              req.query.resolution
+            )
+          )
+        );
+        await redisClient.disconnect();
+
         res.status(200).json({
           success: true,
           message: "Success",
@@ -68,7 +83,7 @@ app.get("/api/trade", async (req, res) => {
           console.log("Connection closed successfully");
         });
       })
-      .catch((err) => console.log("Something went wrong!!", err.message));
+      .catch((err) => console.log("Something went wrong!!", err));
   }
 });
 

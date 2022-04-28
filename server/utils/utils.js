@@ -1,4 +1,5 @@
 import _ from "lodash";
+import crypto from "crypto";
 
 export const coins = ["XBTUSD", "ETHUSD"];
 
@@ -57,4 +58,14 @@ export const formatOHLCData = (rawData, to, from, intervalInMins) => {
   }
 
   return resObj;
+};
+
+export const generateRedisKey = ({
+  cachePrefix = "trade",
+  symbol,
+  to,
+  from,
+  resolution,
+}) => {
+  return `${cachePrefix}/${symbol}/${from}/${to}/${resolution}`;
 };

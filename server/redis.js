@@ -2,15 +2,12 @@ import { createClient } from "redis";
 import { generateRedisKey } from "./utils/utils.js";
 
 export const redisClient = createClient();
+redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
 export const cacheMiddleware = async (req, res, next) => {
-  redisClient.on("error", (err) => console.log("Redis Client Error", err));
-
   await redisClient.connect();
 
   const cachedData = await redisClient.get(generateRedisKey(req.query));
-
-  console.log(generateRedisKey(req.query));
 
   if (cachedData) {
     await redisClient.disconnect();

@@ -1,5 +1,4 @@
 import _ from "lodash";
-import crypto from "crypto";
 
 export const coins = ["XBTUSD", "ETHUSD"];
 
